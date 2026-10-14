@@ -1,0 +1,29 @@
+{
+  "name": "api-festivos",
+  "version": "1.0.0",
+  "description": "API REST para calcular y consultar los días festivos de un año.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "seed": "node scripts/seed.js",
+    "test": "jest --runInBand"
+  },
+  "keywords": [
+    "festivos",
+    "express",
+    "mongodb"
+  ],
+  "author": "Equipo Arquitectura de Software II",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
