@@ -11,7 +11,11 @@ const reglas = [
 
 function crearServicio() {
     return new FestivoServicio({
-        obtenerTodos: jest.fn().mockResolvedValue(reglas)
+        obtenerTodos: jest.fn().mockResolvedValue(reglas),
+        obtenerPorId: jest.fn(),
+        crear: jest.fn(),
+        actualizar: jest.fn(),
+        eliminar: jest.fn()
     });
 }
 
@@ -70,5 +74,27 @@ describe('Servicio de festivos', () => {
         expect(() => servicio.calcularFecha({ tipo: 99 }, 2025, new Date())).toThrow(
             'Tipo de festivo no soportado: 99'
         );
+    });
+
+    test('delega las operaciones CRUD al repositorio', async () => {
+        const repositorio = {
+            obtenerTodos: jest.fn().mockResolvedValue(reglas),
+            obtenerPorId: jest.fn().mockResolvedValue(reglas[0]),
+            crear: jest.fn().mockResolvedValue({ id: 404, ...reglas[0] }),
+            actualizar: jest.fn().mockResolvedValue({ id: 404, ...reglas[1] }),
+            eliminar: jest.fn().mockResolvedValue({ id: 404, ...reglas[1] })
+        };
+        const servicio = new FestivoServicio(repositorio);
+
+        await expect(servicio.listar()).resolves.toBe(reglas);
+        await expect(servicio.obtenerPorId(103)).resolves.toBe(reglas[0]);
+        await expect(servicio.crear(reglas[0])).resolves.toEqual({ id: 404, ...reglas[0] });
+        await expect(servicio.actualizar(404, reglas[1])).resolves.toEqual({ id: 404, ...reglas[1] });
+        await expect(servicio.eliminar(404)).resolves.toEqual({ id: 404, ...reglas[1] });
+
+        expect(repositorio.obtenerPorId).toHaveBeenCalledWith(103);
+        expect(repositorio.crear).toHaveBeenCalledWith(reglas[0]);
+        expect(repositorio.actualizar).toHaveBeenCalledWith(404, reglas[1]);
+        expect(repositorio.eliminar).toHaveBeenCalledWith(404);
     });
 });

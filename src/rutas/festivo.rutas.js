@@ -6,6 +6,43 @@ const router = express.Router();
 
 /**
  * @swagger
+ * /api/festivos:
+ *   get:
+ *     summary: Lista todas las reglas de festivos
+ *     tags: [Festivos CRUD]
+ *     responses:
+ *       200:
+ *         description: Lista completa de festivos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { $ref: '#/components/schemas/Festivo' }
+ *   post:
+ *     summary: Crea un festivo
+ *     tags: [Festivos CRUD]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: '#/components/schemas/FestivoEntrada' }
+ *     responses:
+ *       201:
+ *         description: Festivo creado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Festivo' }
+ *       400: { description: Datos inválidos }
+ */
+router.get('/', (solicitud, respuesta) => festivoControlador.listar(solicitud, respuesta));
+router.post(
+    '/',
+    (solicitud, respuesta, siguiente) => festivoValidador.validarCuerpo(solicitud, respuesta, siguiente),
+    (solicitud, respuesta) => festivoControlador.crear(solicitud, respuesta)
+);
+
+/**
+ * @swagger
  * /api/festivos/verificar/{anio}/{mes}/{dia}:
  *   get:
  *     summary: Determina si una fecha es festiva
@@ -77,6 +114,65 @@ router.get(
     '/obtener/:anio',
     (solicitud, respuesta, siguiente) => festivoValidador.validarAnio(solicitud, respuesta, siguiente),
     (solicitud, respuesta) => festivoControlador.obtener(solicitud, respuesta)
+);
+
+/**
+ * @swagger
+ * /api/festivos/{id}:
+ *   get:
+ *     summary: Obtiene una regla de festivo por id
+ *     tags: [Festivos CRUD]
+ *     parameters:
+ *       - $ref: '#/components/parameters/FestivoId'
+ *     responses:
+ *       200:
+ *         description: Festivo encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Festivo' }
+ *       404: { description: Festivo no encontrado }
+ *   put:
+ *     summary: Reemplaza una regla de festivo
+ *     tags: [Festivos CRUD]
+ *     parameters:
+ *       - $ref: '#/components/parameters/FestivoId'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: '#/components/schemas/FestivoEntrada' }
+ *     responses:
+ *       200:
+ *         description: Festivo actualizado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Festivo' }
+ *       400: { description: Datos inválidos }
+ *       404: { description: Festivo no encontrado }
+ *   delete:
+ *     summary: Elimina una regla de festivo
+ *     tags: [Festivos CRUD]
+ *     parameters:
+ *       - $ref: '#/components/parameters/FestivoId'
+ *     responses:
+ *       200: { description: Festivo eliminado }
+ *       404: { description: Festivo no encontrado }
+ */
+router.get(
+    '/:id',
+    (solicitud, respuesta, siguiente) => festivoValidador.validarId(solicitud, respuesta, siguiente),
+    (solicitud, respuesta) => festivoControlador.obtenerPorId(solicitud, respuesta)
+);
+router.put(
+    '/:id',
+    (solicitud, respuesta, siguiente) => festivoValidador.validarId(solicitud, respuesta, siguiente),
+    (solicitud, respuesta, siguiente) => festivoValidador.validarCuerpo(solicitud, respuesta, siguiente),
+    (solicitud, respuesta) => festivoControlador.actualizar(solicitud, respuesta)
+);
+router.delete(
+    '/:id',
+    (solicitud, respuesta, siguiente) => festivoValidador.validarId(solicitud, respuesta, siguiente),
+    (solicitud, respuesta) => festivoControlador.eliminar(solicitud, respuesta)
 );
 
 module.exports = router;

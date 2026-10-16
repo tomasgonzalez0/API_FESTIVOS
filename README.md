@@ -1,7 +1,7 @@
 # API Festivos
 
-API REST desarrollada con Node.js, Express y MongoDB para calcular los días
-festivos de un año y verificar si una fecha determinada es festiva.
+API REST desarrollada con Node.js, Express y MongoDB para administrar las reglas
+de festivos, calcular los días festivos de un año y verificar una fecha.
 
 ## Arquitectura
 
@@ -15,13 +15,14 @@ Cliente -> index.js -> Rutas -> Validador -> Controlador
 - Las rutas solo conectan middlewares y controladores.
 - Los validadores comprueban parámetros y fechas reales.
 - Los controladores construyen las respuestas HTTP.
-- El servicio aplica las cuatro reglas de cálculo.
+- El servicio coordina el CRUD y aplica las cuatro reglas de cálculo.
 - El repositorio es el único componente que conoce MongoDB.
 
 La colección `tipos` conserva el esquema entregado por el profesor: cada documento
-representa uno de los cuatro modos de cálculo e incluye un arreglo `festivos`. El
-repositorio transforma esos arreglos en un modelo plano antes de entregarlos al
-servicio.
+representa uno de los cuatro modos de cálculo e incluye un arreglo `festivos`. Cada
+festivo tiene un `id` estable. El repositorio transforma esos arreglos en un modelo
+plano antes de entregarlos al servicio y vuelve a ubicarlos en el tipo correcto al
+crearlos o actualizarlos.
 
 ## Requisitos
 
@@ -61,6 +62,26 @@ npm start
 
 ## Endpoints
 
+### CRUD de reglas de festivos
+
+| Método | Ruta | Resultado |
+| --- | --- | --- |
+| `GET` | `/api/festivos` | Lista todas las reglas |
+| `GET` | `/api/festivos/:id` | Consulta una regla |
+| `POST` | `/api/festivos` | Crea una regla |
+| `PUT` | `/api/festivos/:id` | Reemplaza una regla |
+| `DELETE` | `/api/festivos/:id` | Elimina una regla |
+
+Para los tipos `1` y `2` se requieren `dia` y `mes`; `diasPascua` se normaliza a
+cero. Para los tipos `3` y `4` se requiere `diasPascua`; `dia` y `mes` se
+normalizan a cero.
+
+```bash
+curl -X POST http://localhost:3030/api/festivos \
+  -H "Content-Type: application/json" \
+  -d '{"tipo":1,"dia":1,"mes":6,"nombre":"Festivo de ejemplo"}'
+```
+
 ### Verificar una fecha
 
 ```bash
@@ -94,4 +115,5 @@ npm test
 ```
 
 Las pruebas cubren años bisiestos, fechas inválidas, cálculo de Domingo de Ramos y
-Pascua, traslados al lunes y las reglas de los cuatro tipos de festivo.
+Pascua, traslados al lunes, las cuatro reglas de festivo, validación del CRUD y la
+delegación entre servicio y repositorio.

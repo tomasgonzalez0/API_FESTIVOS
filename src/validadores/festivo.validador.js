@@ -40,6 +40,69 @@ class FestivoValidador {
         solicitud.anioValidado = valor;
         return siguiente();
     }
+
+    validarId(solicitud, respuesta, siguiente) {
+        const { id } = solicitud.params;
+        if (!esEnteroPositivo(id) || Number(id) < 1) {
+            return respuesta.status(400).json({ mensaje: 'El id debe ser un número entero positivo.' });
+        }
+
+        solicitud.idValidado = Number(id);
+        return siguiente();
+    }
+
+    validarCuerpo(solicitud, respuesta, siguiente) {
+        const { tipo, dia, mes, nombre, diasPascua } = solicitud.body || {};
+        const tipoNumero = Number(tipo);
+        const nombreLimpio = typeof nombre === 'string' ? nombre.trim() : '';
+        const errores = [];
+
+        if (!Number.isInteger(tipoNumero) || tipoNumero < 1 || tipoNumero > 4) {
+            errores.push('El tipo debe ser un entero entre 1 y 4.');
+        }
+        if (nombreLimpio.length < 2 || nombreLimpio.length > 100) {
+            errores.push('El nombre debe contener entre 2 y 100 caracteres.');
+        }
+
+        let festivo;
+        if (tipoNumero === 1 || tipoNumero === 2) {
+            const diaNumero = Number(dia);
+            const mesNumero = Number(mes);
+            if (!Number.isInteger(diaNumero) || !Number.isInteger(mesNumero)
+                || !esFechaValida(2024, mesNumero, diaNumero)) {
+                errores.push('Día y mes deben formar una fecha válida.');
+            }
+            festivo = {
+                tipo: tipoNumero,
+                dia: diaNumero,
+                mes: mesNumero,
+                nombre: nombreLimpio,
+                diasPascua: 0
+            };
+        } else if (tipoNumero === 3 || tipoNumero === 4) {
+            const diasNumero = Number(diasPascua);
+            if (!Number.isInteger(diasNumero) || diasNumero < -366 || diasNumero > 366) {
+                errores.push('diasPascua debe ser un entero entre -366 y 366.');
+            }
+            festivo = {
+                tipo: tipoNumero,
+                dia: 0,
+                mes: 0,
+                nombre: nombreLimpio,
+                diasPascua: diasNumero
+            };
+        }
+
+        if (errores.length > 0) {
+            return respuesta.status(400).json({
+                mensaje: 'Los datos del festivo no son válidos.',
+                errores
+            });
+        }
+
+        solicitud.festivoValidado = festivo;
+        return siguiente();
+    }
 }
 
 module.exports = new FestivoValidador();

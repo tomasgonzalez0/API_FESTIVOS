@@ -47,6 +47,26 @@ class FestivoServicio {
         const festivos = await this.obtenerPorAnio(anio);
         return festivos.some((festivo) => festivo.fecha === fechaConsultada);
     }
+
+    async listar() {
+        return this.repositorio.obtenerTodos();
+    }
+
+    async obtenerPorId(id) {
+        return this.repositorio.obtenerPorId(id);
+    }
+
+    async crear(festivo) {
+        return this.repositorio.crear(festivo);
+    }
+
+    async actualizar(id, festivo) {
+        return this.repositorio.actualizar(id, festivo);
+    }
+
+    async eliminar(id) {
+        return this.repositorio.eliminar(id);
+    }
 }
 
 module.exports = new FestivoServicio();
