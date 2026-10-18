@@ -51,6 +51,16 @@ class FestivoValidador {
         return siguiente();
     }
 
+    validarNombre(solicitud, respuesta, siguiente) {
+        const nombre = String(solicitud.params.nombre || '').trim();
+        if (nombre.length < 2 || nombre.length > 100) {
+            return respuesta.status(400).json({ mensaje: 'El nombre debe contener entre 2 y 100 caracteres.' });
+        }
+
+        solicitud.nombreValidado = nombre;
+        return siguiente();
+    }
+
     validarCuerpo(solicitud, respuesta, siguiente) {
         const { tipo, dia, mes, nombre, diasPascua } = solicitud.body || {};
         const tipoNumero = Number(tipo);

@@ -56,6 +56,10 @@ class FestivoServicio {
         return this.repositorio.obtenerPorId(id);
     }
 
+    async obtenerPorNombre(nombre) {
+        return this.repositorio.obtenerPorNombre(nombre);
+    }
+
     async crear(festivo) {
         return this.repositorio.crear(festivo);
     }

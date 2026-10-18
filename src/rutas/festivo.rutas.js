@@ -118,6 +118,33 @@ router.get(
 
 /**
  * @swagger
+ * /api/festivos/nombre/{nombre}:
+ *   get:
+ *     summary: Busca reglas de festivos por coincidencia en el nombre
+ *     tags: [Festivos CRUD]
+ *     parameters:
+ *       - in: path
+ *         name: nombre
+ *         required: true
+ *         schema: { type: string, example: Año nuevo }
+ *     responses:
+ *       200:
+ *         description: Lista de festivos coincidentes, vacía si no hay resultados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { $ref: '#/components/schemas/Festivo' }
+ *       400: { description: Nombre inválido }
+ */
+router.get(
+    '/nombre/:nombre',
+    (solicitud, respuesta, siguiente) => festivoValidador.validarNombre(solicitud, respuesta, siguiente),
+    (solicitud, respuesta) => festivoControlador.obtenerPorNombre(solicitud, respuesta)
+);
+
+/**
+ * @swagger
  * /api/festivos/{id}:
  *   get:
  *     summary: Obtiene una regla de festivo por id

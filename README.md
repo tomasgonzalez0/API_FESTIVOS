@@ -68,6 +68,7 @@ npm start
 | --- | --- | --- |
 | `GET` | `/api/festivos` | Lista todas las reglas |
 | `GET` | `/api/festivos/:id` | Consulta una regla |
+| `GET` | `/api/festivos/nombre/:nombre` | Busca reglas por coincidencia parcial del nombre |
 | `POST` | `/api/festivos` | Crea una regla |
 | `PUT` | `/api/festivos/:id` | Reemplaza una regla |
 | `DELETE` | `/api/festivos/:id` | Elimina una regla |
@@ -75,6 +76,13 @@ npm start
 Para los tipos `1` y `2` se requieren `dia` y `mes`; `diasPascua` se normaliza a
 cero. Para los tipos `3` y `4` se requiere `diasPascua`; `dia` y `mes` se
 normalizan a cero.
+
+La búsqueda por nombre no distingue mayúsculas y minúsculas y responde con una
+lista JSON (vacía si no hay coincidencias). Por ejemplo:
+
+```bash
+curl http://localhost:3030/api/festivos/nombre/San
+```
 
 ```bash
 curl -X POST http://localhost:3030/api/festivos \

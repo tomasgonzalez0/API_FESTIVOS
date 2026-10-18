@@ -47,6 +47,15 @@ class FestivoControlador {
         }
     }
 
+    async obtenerPorNombre(solicitud, respuesta) {
+        try {
+            const festivos = await festivoServicio.obtenerPorNombre(solicitud.nombreValidado);
+            return respuesta.json(festivos);
+        } catch (error) {
+            return this.manejarError(respuesta, error, 'consultando');
+        }
+    }
+
     async crear(solicitud, respuesta) {
         try {
             const festivo = await festivoServicio.crear(solicitud.festivoValidado);

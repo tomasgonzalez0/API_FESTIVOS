@@ -51,6 +51,29 @@ class FestivoRepositorio {
         return documentos ? crearFestivo(documentos) : null;
     }
 
+    async obtenerPorNombre(nombre) {
+        const patron = new RegExp(nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        const documentos = await this.coleccion.aggregate([
+            { $match: { 'festivos.nombre': patron } },
+            { $unwind: '$festivos' },
+            { $match: { 'festivos.nombre': patron } },
+            {
+                $project: {
+                    _id: 0,
+                    id: '$festivos.id',
+                    tipo: '$id',
+                    dia: { $ifNull: ['$festivos.dia', 0] },
+                    mes: { $ifNull: ['$festivos.mes', 0] },
+                    nombre: '$festivos.nombre',
+                    diasPascua: { $ifNull: ['$festivos.diasPascua', 0] }
+                }
+            },
+            { $sort: { id: 1 } }
+        ]).toArray();
+
+        return documentos.map(crearFestivo);
+    }
+
     async obtenerSiguienteId() {
         const resultado = await this.coleccion.aggregate([
             { $unwind: '$festivos' },

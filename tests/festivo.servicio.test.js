@@ -80,6 +80,7 @@ describe('Servicio de festivos', () => {
         const repositorio = {
             obtenerTodos: jest.fn().mockResolvedValue(reglas),
             obtenerPorId: jest.fn().mockResolvedValue(reglas[0]),
+            obtenerPorNombre: jest.fn().mockResolvedValue([reglas[0]]),
             crear: jest.fn().mockResolvedValue({ id: 404, ...reglas[0] }),
             actualizar: jest.fn().mockResolvedValue({ id: 404, ...reglas[1] }),
             eliminar: jest.fn().mockResolvedValue({ id: 404, ...reglas[1] })
@@ -88,11 +89,13 @@ describe('Servicio de festivos', () => {
 
         await expect(servicio.listar()).resolves.toBe(reglas);
         await expect(servicio.obtenerPorId(103)).resolves.toBe(reglas[0]);
+        await expect(servicio.obtenerPorNombre('Independencia')).resolves.toEqual([reglas[0]]);
         await expect(servicio.crear(reglas[0])).resolves.toEqual({ id: 404, ...reglas[0] });
         await expect(servicio.actualizar(404, reglas[1])).resolves.toEqual({ id: 404, ...reglas[1] });
         await expect(servicio.eliminar(404)).resolves.toEqual({ id: 404, ...reglas[1] });
 
         expect(repositorio.obtenerPorId).toHaveBeenCalledWith(103);
+        expect(repositorio.obtenerPorNombre).toHaveBeenCalledWith('Independencia');
         expect(repositorio.crear).toHaveBeenCalledWith(reglas[0]);
         expect(repositorio.actualizar).toHaveBeenCalledWith(404, reglas[1]);
         expect(repositorio.eliminar).toHaveBeenCalledWith(404);
